@@ -52,12 +52,12 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     ),
 
     [1] = LAYOUT(
-        _______, KC_CALC, KC_MYCM, KC_MSEL, KC_MAIL,  KC_WHOM, _______, _______, _______, _______, _______, KC_WAKE, KC_SLEP, KC_PAUS,         _______,
+        _______, _______, _______, _______, _______,  _______, _______, _______, _______, _______, _______, KC_WAKE, KC_SLEP, _______,         _______,
       LED_TILDE, LED_1,  LED_2,   LED_3,   LED_4,    LED_5,   LED_6,   LED_7,   LED_8,   LED_9,   LED_0,   LED_MINS, LED_EQL,  KC_INS,         KC_SLCK,
         _______, RGB_SAI, RGB_VAI, RGB_HUI, RGB_TOG,  _______, _______, _______, _______, _______, _______, _______, _______, RESET,           KC_BRIU,
        _______, RGB_RMOD, RGB_VAD, RGB_MOD, RGB_SPI, _______,  _______, _______, _______, QMKBEST, _______, _______,         _______,          KC_BRID,
         _______,          _______, _______, _______, _______,  _______, NK_TOGG, _______, _______, _______, _______,         _______, KC_MPLY, KC_PWR,
-        _______, _______, _______,                             _______,                            _______, _______, KC_APP, KC_MPRV, KC_MSTP, KC_MNXT
+        _______, _______, _______,                             _______,                            _______, _______, _______, KC_MPRV, KC_MSTP, KC_MNXT
     ),
 
 };
@@ -91,6 +91,21 @@ bool encoder_update_user(uint8_t index, bool clockwise) {
       #endif
     }
     set_mods(mod_state);
+  } else if (get_mods() & MOD_MASK_GUI){
+    uint8_t mod_state = get_mods(); // Store all  modifiers that are held
+    unregister_mods(MOD_MASK_GUI); // Immediately unregister the GUI key 
+    if (clockwise) {
+      register_code(KC_LGUI);
+      register_code(KC_UP);
+      unregister_code(KC_LGUI);
+      unregister_code(KC_UP);
+    } else {
+      register_code(KC_LGUI);
+      register_code(KC_DOWN);
+      unregister_code(KC_LGUI);
+      unregister_code(KC_DOWN);
+    }
+    set_mods(mod_state); // Add back in the CTRL key - so ctrl-key will work if ctrl was never released after paging.
   } else if (clockwise) { // All else volume.
     tap_code(KC_VOLU);
   } else {
